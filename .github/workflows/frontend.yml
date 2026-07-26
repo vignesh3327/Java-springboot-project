@@ -61,7 +61,7 @@ jobs:
 
             APP_DIR=/home/ec2-user/front
             REPO_NAME=Java-springboot-project
-            REPO_URL=https://github.com/CloudTechDevOps/Java-springboot-project.git
+            REPO_URL=https://github.com/vignesh3327/Java-springboot-project.git
 
             echo "🚀 Starting deployment..."
 
