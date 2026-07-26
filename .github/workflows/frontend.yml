@@ -4,12 +4,12 @@ on:
   # push:
   #   branches:
   #     - main
-
   workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # 1. The job lands on your private runner server (10.0.135.202)
+    runs-on: [self-hosted, fullstack]
 
     steps:
       - name: Checkout Repository
@@ -47,15 +47,15 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       ######################################################
-      # Deploy
+      # Deploy via SSH (Runner connects to App Server)
       ######################################################
 
-      - name: Deploy via SSH
+      - name: Deploy via SSH to Application Server
         uses: appleboy/ssh-action@v1.1.0
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.FRONTEND_HOST }}
           username: ec2-user
-          key: ${{ secrets.EC2_KEY }}
+          key: ${{ secrets.FRONTEND_KEY }}
           script: |
             set -e
 
@@ -101,7 +101,7 @@ jobs:
 
             ExecStart=/bin/bash -c 'source /home/ec2-user/front/Java-springboot-project/frontend/venv/bin/activate && streamlit run app.py --server.port=8501 --server.address=0.0.0.0'
 
-            Environment=API_URL=http://localhost:8084
+            Environment=API_URL=http://${{ secrets.BACKEND_IP }}:8084
 
             Restart=always
             RestartSec=5
@@ -153,7 +153,7 @@ jobs:
             Quality Gate       : Passed
 
             Deployment Target  : EC2
-            Frontend URL       : http://${{ secrets.EC2_HOST }}:8501
+            Frontend URL       : http://${{ secrets.FRONTEND_HOST }}:8501
 
             Regards,
             GitHub Actions
